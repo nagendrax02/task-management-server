@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { isAppError } from "../utils/createAppError";
-import { HTTP_STATUS } from "../constants/httpstatus";
+import { ERROR_CODES, HTTP_STATUS } from "../constants/httpStatus";
+import { ZodError } from "zod";
 
 
 export const errorMiddleware = (
@@ -11,6 +12,18 @@ export const errorMiddleware = (
 ): void => {
   if (response.headersSent) {
     next(err);
+    return;
+  }
+
+  if (err instanceof ZodError) {
+    response.status(HTTP_STATUS.BAD_REQUEST).json({
+      success: false,
+      error: {
+        code: ERROR_CODES.VALIDATION_ERROR,
+        message: "Validation failed",
+        details: err.issues.map(({ path, message }) => ({ path, message })),
+      },
+    });
     return;
   }
 

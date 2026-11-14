@@ -1,5 +1,5 @@
 import pool from "../../config/db";
-import { ERROR_CODES, HTTP_STATUS, POSTGRES_ERROR_CODES } from "../../constants/httpstatus";
+import { ERROR_CODES, HTTP_STATUS, POSTGRES_ERROR_CODES } from "../../constants/httpStatus";
 import { createAppError } from "../../utils/createAppError";
 import { RegisterUserInput, PublicUser } from "./auth.types";
 
