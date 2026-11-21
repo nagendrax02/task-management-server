@@ -1,7 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
-import type { PublicUser, RegisterUserInput } from "./auth.types";
+import type { LoginUserInput, PublicUser, RegisterUserInput } from "./auth.types";
 
-import { registerUser } from "./auth.service";
+import { loginUser, registerUser } from "./auth.service";
+import { HTTP_STATUS } from "../../constants/httpStatus";
 
 export const register = async (
   req: Request,
@@ -19,3 +20,17 @@ export const register = async (
     next(err);
   }
 };
+
+export const login = async (req: Request, res: Response, next: NextFunction): Promise<void>=>{
+    try{
+        const {email, password} = req.body as LoginUserInput;
+        const user = await loginUser(email, password);
+        res.status(HTTP_STATUS.OK).json({
+            success: true,
+            message: "User Logged In Successfully",
+            data: user
+        })
+    } catch (err) {
+        next(err);
+    }
+}
