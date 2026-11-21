@@ -1,7 +1,11 @@
 import pool from "../../config/db";
-import { ERROR_CODES, HTTP_STATUS, POSTGRES_ERROR_CODES } from "../../constants/httpStatus";
+import {
+  ERROR_CODES,
+  HTTP_STATUS,
+  POSTGRES_ERROR_CODES,
+} from "../../constants/httpStatus";
 import { createAppError } from "../../utils/createAppError";
-import { RegisterUserInput, PublicUser } from "./auth.types";
+import { RegisterUserInput, PublicUser, AuthUserRecord } from "./auth.types";
 
 export const createUser = async (
   name: string,
@@ -22,8 +26,22 @@ export const createUser = async (
       error.code === POSTGRES_ERROR_CODES.UNIQUE_VIOLATION &&
       error.constraint === "users_email_key"
     ) {
-      throw createAppError(HTTP_STATUS.CONFLICT, ERROR_CODES.EMAIL_EXISTS, "Email already exists");
+      throw createAppError(
+        HTTP_STATUS.CONFLICT,
+        ERROR_CODES.EMAIL_EXISTS,
+        "Email already exists",
+      );
     }
     throw error;
   }
+};
+
+export const findUserByEmail = async (
+  email: string,
+): Promise<AuthUserRecord | null> => {
+  const user = await pool.query<AuthUserRecord>(
+    "SELECT id, name, email, password_hash FROM users WHERE email = $1 LIMIT 1",
+    [email],
+  );
+  return user.rows[0] ?? null;
 };
