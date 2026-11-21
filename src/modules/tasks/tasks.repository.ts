@@ -14,3 +14,15 @@ export const createTask = async (
 
   return result.rows[0];
 };
+
+export const findTasksByUserId = async (userId: string): Promise<Task[]> => {
+  const result = await pool.query<Task>(
+    `SELECT id, user_id, title, description, completed, created_at, updated_at
+     FROM tasks
+     WHERE user_id = $1
+     ORDER BY created_at DESC`,
+    [userId],
+  );
+
+  return result.rows;
+};
